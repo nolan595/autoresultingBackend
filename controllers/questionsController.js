@@ -12,10 +12,22 @@ exports.getQuestions = (req, res) => {
 // create or update question
 exports.saveQuestion = (req, res) => { 
     const newQuestion = req.body;
-    const questions = readFromFile(QUESTIONS_FILE);
-    questions.push(newQuestion); // add new question to questions array
-    writeToFile(QUESTIONS_FILE, questions)
-    res.json({message: 'question saved'}) // return success message
+    if (!newQuestion || !newQuestion.id) { // if question data is invalid
+        return res.status(400).json({error: 'Invalid question data'})
+    }
+
+    try {
+        const questions = readFromFile(QUESTIONS_FILE);
+        questions.push(newQuestion); // add new question to questions array
+        writeToFile(QUESTIONS_FILE, questions)
+        res.json({message: 'question saved'}) // return success message
+
+
+
+    } catch (error) {
+        res.status(500).json({error: 'Error saving question'}) // return error message        
+    }
+
 
 }
 
@@ -23,7 +35,7 @@ exports.updateQuestion = (req, res) => {
     const {id} = req.params;
     const updatedQuestion = req.body;
     const questions = readFromFile(QUESTIONS_FILE);
-    const index = questions.findIndex(q => q.id === id); // find index of question
+    const index = questions.findIndex(q => q.id.toString() === id.toString()); // find index of question
     if (index === -1) {
         return res.status(404).json({message: 'question not found'})
     } // if question not found
@@ -36,7 +48,7 @@ exports.updateQuestion = (req, res) => {
 exports.deleteQuestion = (req, res) => {
     const {id} = req.params;
     let questions = readFromFile(QUESTIONS_FILE);
-    questions = questions.filter(q => q.id !== id); // remove question with given id
+    questions = questions.filter(q => q.id.toString() !== id.toString()); // remove question with given id
     writeToFile(QUESTIONS_FILE, questions); // write updated questions array to file
     res.json({message: 'question deleted'})
 }

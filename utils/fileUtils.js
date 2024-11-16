@@ -1,5 +1,6 @@
 /* This file is used to read and write to json files*/
 
+const { json } = require('express');
 const fs = require('fs');
 const path = require('path');
 
@@ -7,7 +8,8 @@ const path = require('path');
 const readFromFile = (filePath) => {
     try {
         const data = fs.readFileSync(filePath, 'utf8');
-        return JSON.parse(data || '[]');        
+        const parsedData = JSON.parse(data);
+        return parsedData;
     } catch (error) {
         console.error(`Error reading from file ${filePath}`, error)
         return [];
@@ -15,12 +17,13 @@ const readFromFile = (filePath) => {
 }
 
 // write to file
-
-const writeToFile = (filePath) => {
+const writeToFile = (filePath, data) => {
     try {
-        fs.writeFileSync(filePath, JSON.stringify(data, null, 2));
+
+        fs.writeFileSync(filePath, JSON.stringify(data, null, 2))
     } catch (error) {
         console.error(`Error writing to file ${filePath}`);
+        console.error(`Error details: ${error}`);
     }
 }
 
